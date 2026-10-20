@@ -68,6 +68,24 @@ demo/make_demo.py     # builds the messy demo folder
 
 **The split of labor.** Type folders are a solved problem: an extension is not a guess, so rules do it, instantly and offline. The model is reserved for the one job that actually needs reading. That split is also a safety feature — the model never decides *whether* a file moves, only what it is called.
 
+```mermaid
+flowchart TD
+    A[Messy folder] --> B[Scan<br/>top level, up to 40 files]
+    B --> C[Rules<br/>extension to type folder]
+    B --> D{Cryptic name<br/>and readable?}
+    D -- yes --> E[Local model<br/>qwen2.5:3b via Ollama<br/>200 chars to kebab-case name]
+    D -- no --> C
+    E -.->|endpoint down| C
+    C --> F[Plan]
+    E --> F
+    F -->|dry run| G[Show the plan<br/>nothing moves]
+    F -->|--apply| H[Move files<br/>never delete, never overwrite]
+    H --> I[Undo log<br/>.slothsort/runs/]
+    I -->|--undo| A
+```
+
+Nothing moves until you pass `--apply`, and the model can only change a name — never the destination or the decision to move.
+
 **The failure that shaped the design.** My first version asked the model to classify eight files at once, in a JSON array with ids. On a 3B model it returned three of eight, then mixed the names between files — the invoice got the receipt's name, the receipt got the scan's. The fix was to shrink the task until it fit the model: one file, one short answer, no ids to mismatch. The prompt now asks for a kebab-case name only; the tool sanitizes it, keeps the extension, and rejects anything that looks like prose.
 
 **Reading files without dependencies.** `pdftotext` for PDFs (optional), `zipfile` + XML for `.docx`/`.pptx`/`.xlsx`, plain reads for text. The first ~200 characters are enough for the model to know what a document is.

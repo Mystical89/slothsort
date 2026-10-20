@@ -120,6 +120,22 @@ at all: the endpoint is `127.0.0.1` by default.
 
 ## How it works
 
+```mermaid
+flowchart TD
+    A[Messy folder] --> B[Scan<br/>top level, up to 40 files]
+    B --> C[Rules<br/>extension to type folder]
+    B --> D{Cryptic name<br/>and readable?}
+    D -- yes --> E[Local model<br/>qwen2.5:3b via Ollama<br/>200 chars to kebab-case name]
+    D -- no --> C
+    E -.->|endpoint down| C
+    C --> F[Plan]
+    E --> F
+    F -->|dry run| G[Show the plan<br/>nothing moves]
+    F -->|--apply| H[Move files<br/>never delete, never overwrite]
+    H --> I[Undo log<br/>.slothsort/runs/]
+    I -->|--undo| A
+```
+
 1. Scan the folder (top level, up to `--max` files, default 40).
 2. Sort by extension into `Documents/`, `Images/`, `Archives/`, …
 3. For each file with a cryptic name that we can read, take the first ~200

@@ -221,6 +221,13 @@ def category_for(ext: str) -> str:
     return EXT_TO_CATEGORY.get(ext.lower(), "Misc")
 
 
+def category_for_file(item: FileItem) -> str:
+    """Type folders, plus the one name-based rule: screenshots are not photos."""
+    if "screenshot" in item.name.lower():
+        return "Screenshots"
+    return category_for(item.ext)
+
+
 def _clean(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()[:SNIPPET_CHARS]
 
@@ -387,7 +394,7 @@ def build_plan(
     files: list[FileItem], opts: Options, chat=post_chat
 ) -> tuple[list[PlanItem], bool]:
     """Sort by rules; ask the model to rename documents whose names say nothing."""
-    plan = [PlanItem(f, category_for(f.ext), f.name, "rules") for f in files]
+    plan = [PlanItem(f, category_for_file(f), f.name, "rules") for f in files]
     use_model = not opts.offline and bool(files) and model_available(opts)
     used_model = False
 
@@ -502,7 +509,15 @@ def apply_plan(root: Path, plan: list[PlanItem]) -> Path:
 
 def undo_last_run(root: Path) -> int:
     run_dir = root / LOG_DIR / "runs"
-    runs = sorted(run_dir.glob("*.json")) if run_dir.is_dir() else []
+    runs = (
+        sorted(
+            path
+            for path in run_dir.glob("*.json")
+            if not path.name.endswith(".undone.json")
+        )
+        if run_dir.is_dir()
+        else []
+    )
     if not runs:
         sys.stderr.write(f"slothsort: no runs to undo in {root / LOG_DIR}\n")
         return 1
@@ -518,6 +533,9 @@ def undo_last_run(root: Path) -> int:
         source.parent.mkdir(parents=True, exist_ok=True)
         shutil.move(str(destination), str(unique_path(source)))
         restored += 1
+    if restored == 0:
+        sys.stderr.write("slothsort: nothing to undo — the files are already back\n")
+        return 1
     log_path.rename(log_path.with_suffix(".undone.json"))
     print(f"Undone {restored} moves from run {data.get('run', log_path.stem)}.")
     return 0

@@ -76,6 +76,16 @@ class RulesTest(unittest.TestCase):
         self.assertFalse(slothsort.is_cryptic("invoice-march.pdf"))
         self.assertFalse(slothsort.is_cryptic("notes.md"))
 
+    def test_category_for_file_screenshot(self):
+        shot = slothsort.FileItem(
+            path=Path("x"), name="Screenshot 2026-10-18.png", ext=".png", size=0, mtime=0
+        )
+        photo = slothsort.FileItem(
+            path=Path("y"), name="photo.jpg", ext=".jpg", size=0, mtime=0
+        )
+        self.assertEqual(slothsort.category_for_file(shot), "Screenshots")
+        self.assertEqual(slothsort.category_for_file(photo), "Images")
+
     def test_unique_path(self):
         with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
@@ -180,6 +190,7 @@ class PlanTest(TempFolder):
         make_file(self.folder, "Screenshot from 2026-10-18 14-22-31.png")
         files = slothsort.collect_files(self.folder)
         plan, _ = slothsort.build_plan(files, slothsort.Options(offline=True))
+        self.assertEqual(plan[0].category, "Screenshots")
         self.assertEqual(plan[0].new_name, "screenshot-from-2026-10-18-14-22-31.png")
         self.assertEqual(plan[0].decided_by, "tidy")
 
@@ -223,6 +234,19 @@ class ApplyUndoTest(TempFolder):
         self.assertTrue((self.folder / "invoice.pdf").is_file())
         self.assertTrue((self.folder / "photo.jpg").is_file())
         self.assertFalse((self.folder / "Documents" / "invoice.pdf").exists())
+
+    def test_undo_twice_returns_error(self):
+        make_file(self.folder, "invoice.pdf")
+        files = slothsort.collect_files(self.folder)
+        plan, _ = slothsort.build_plan(files, slothsort.Options(offline=True))
+        slothsort.apply_plan(self.folder, plan)
+
+        self.assertEqual(slothsort.undo_last_run(self.folder), 0)
+        self.assertEqual(slothsort.undo_last_run(self.folder), 1)
+        self.assertTrue((self.folder / "invoice.pdf").is_file())
+        runs = sorted((self.folder / slothsort.LOG_DIR / "runs").glob("*.json"))
+        self.assertEqual(len(runs), 1)
+        self.assertTrue(runs[0].name.endswith(".undone.json"))
 
     def test_undo_without_runs(self):
         self.assertEqual(slothsort.undo_last_run(self.folder), 1)

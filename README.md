@@ -77,6 +77,7 @@ slothsort · /home/mystical/projects/slothsort/demo/messy  (14 files, 4.0 KB)
   Images/
     IMG_2041.jpg                                                           [rules]
     photo_2026-09-30.jpg                                                   [rules]
+  Screenshots/
     Screenshot from 2026-10-18 14-22-31.png  →  screenshot-from-2026-10-18-14-22-31.png [tidy]
   Audio/
     song.mp3                                                               [rules]
@@ -88,11 +89,11 @@ slothsort · /home/mystical/projects/slothsort/demo/messy  (14 files, 4.0 KB)
   Code/
     main.py                                                                [rules]
 
-Plan: 14 files → 7 folders, 3 renames. Dry run — nothing moved. Use --apply.
+Plan: 14 files → 8 folders, 3 renames. Dry run — nothing moved. Use --apply.
 ```
 
 `--apply` moved those 14 files in **10.6 s** (warm model). A cold start costs
-another ~40 s while the 3B model loads into RAM. Undo restored all 14 in one
+another ~60 s while the 3B model loads into RAM. Undo restored all 14 in one
 command.
 
 ## What the model does — and what it doesn't
@@ -148,7 +149,7 @@ interactive clicking.
 python3 -m unittest -v test_slothsort.py
 ```
 
-22 tests, no network and no model required — parsing, rules, planning, apply,
+24 tests, no network and no model required — parsing, rules, planning, apply,
 dedupe and undo are all covered with a fake chat function.
 
 ## License

@@ -83,8 +83,17 @@ class RulesTest(unittest.TestCase):
         photo = slothsort.FileItem(
             path=Path("y"), name="photo.jpg", ext=".jpg", size=0, mtime=0
         )
+        report = slothsort.FileItem(
+            path=Path("z"), name="report_screenshot.pdf", ext=".pdf", size=0, mtime=0
+        )
         self.assertEqual(slothsort.category_for_file(shot), "Screenshots")
         self.assertEqual(slothsort.category_for_file(photo), "Images")
+        self.assertEqual(slothsort.category_for_file(report), "Documents")
+
+    def test_plural(self):
+        self.assertEqual(slothsort.plural(1, "file"), "1 file")
+        self.assertEqual(slothsort.plural(0, "rename"), "0 renames")
+        self.assertEqual(slothsort.plural(8, "folder"), "8 folders")
 
     def test_unique_path(self):
         with tempfile.TemporaryDirectory() as tmp:

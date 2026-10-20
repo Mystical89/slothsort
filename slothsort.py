@@ -165,6 +165,19 @@ TEXT_EXTS = {
     ".cfg",
 }
 
+IMAGE_EXTS = {
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".webp",
+    ".bmp",
+    ".tiff",
+    ".tif",
+    ".heic",
+    ".svg",
+}
+
 # files we can read and therefore rename from content
 READABLE_EXTS = {".pdf", ".docx", ".pptx", ".xlsx"} | TEXT_EXTS
 
@@ -223,9 +236,13 @@ def category_for(ext: str) -> str:
 
 def category_for_file(item: FileItem) -> str:
     """Type folders, plus the one name-based rule: screenshots are not photos."""
-    if "screenshot" in item.name.lower():
+    if item.ext in IMAGE_EXTS and "screenshot" in item.name.lower():
         return "Screenshots"
     return category_for(item.ext)
+
+
+def plural(count: int, word: str) -> str:
+    return f"{count} {word}" if count == 1 else f"{count} {word}s"
 
 
 def _clean(text: str) -> str:
@@ -428,7 +445,7 @@ def build_plan(
 
 def print_plan(root: Path, plan: list[PlanItem]) -> None:
     total = sum(item.file.size for item in plan)
-    print(f"slothsort · {root}  ({len(plan)} files, {human_size(total)})")
+    print(f"slothsort · {root}  ({plural(len(plan), 'file')}, {human_size(total)})")
     print()
     by_category: dict[str, list[PlanItem]] = {}
     for item in plan:
@@ -448,8 +465,8 @@ def print_plan(root: Path, plan: list[PlanItem]) -> None:
     folders = len(by_category)
     print()
     print(
-        f"Plan: {len(plan)} files → {folders} folders, {renamed} renames. "
-        "Dry run — nothing moved. Use --apply."
+        f"Plan: {plural(len(plan), 'file')} → {plural(folders, 'folder')}, "
+        f"{plural(renamed, 'rename')}. Dry run — nothing moved. Use --apply."
     )
 
 
@@ -612,7 +629,7 @@ def main(argv: list[str] | None = None) -> int:
     log_path = apply_plan(root, plan)
     elapsed = time.monotonic() - started
     print(
-        f"\nDone in {elapsed:.1f} s: {len(plan)} files, "
+        f"\nDone in {elapsed:.1f} s: {plural(len(plan), 'file')}, "
         f"{'model ' + opts.model if used_model else 'offline rules'}."
     )
     print(f"Log:  {log_path}")

@@ -122,18 +122,15 @@ at all: the endpoint is `127.0.0.1` by default.
 
 ```mermaid
 flowchart TD
-    A[Messy folder] --> B[Scan<br/>top level, up to 40 files]
-    B --> C[Rules<br/>extension to type folder]
-    B --> D{Cryptic name<br/>and readable?}
-    D -- yes --> E[Local model<br/>qwen2.5:3b via Ollama<br/>200 chars to kebab-case name]
-    D -- no --> C
-    E -.->|endpoint down| C
-    C --> F[Plan]
-    E --> F
-    F -->|dry run| G[Show the plan<br/>nothing moves]
-    F -->|--apply| H[Move files<br/>never delete, never overwrite]
-    H --> I[Undo log<br/>.slothsort/runs/]
-    I -->|--undo| A
+    A[Messy folder] --> B[Rules<br/>type + name]
+    A --> C{Cryptic name?}
+    C -- yes --> D[Model<br/>names it]
+    C -- no --> B
+    D -.->|offline or unreadable| B
+    B --> E[Plan<br/>dry run]
+    D --> E
+    E -->|--apply| F[Move + undo log]
+    F -->|--undo| A
 ```
 
 1. Scan the folder (top level, up to `--max` files, default 40).
@@ -165,7 +162,7 @@ interactive clicking.
 python3 -m unittest -v test_slothsort.py
 ```
 
-24 tests, no network and no model required — parsing, rules, planning, apply,
+25 tests, no network and no model required — parsing, rules, planning, apply,
 dedupe and undo are all covered with a fake chat function.
 
 ## License

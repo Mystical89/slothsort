@@ -103,6 +103,30 @@ Three reasons, and the first one is why the tool exists at all.
 
 **The model is a flag, not a decision.** `--model qwen2.5:7b` when the hardware improves; `--base-url` for LM Studio, llama.cpp or vLLM. No code changes, no vendor, no lock-in. And it works offline — on a train, on a plane, or in a country where the API is blocked.
 
+## My Agent Session
+
+This project was built in a **Hermes Agent** session — an open-source agent harness. The tool it produced runs `qwen2.5:3b` locally through Ollama. The full transcript is mostly tool calls, so here are the three moments that shaped the project. Quotes are translated from Russian and lightly condensed.
+
+**Choosing the runtime.** I started by asking whether a local-first desktop agent I had found could replace Ollama. The answer was no — and that answer set the architecture:
+
+> **Me:** Won't this work instead of Ollama or LM Studio?
+> **Hermes:** No — it's a different layer. Evir is a desktop agent that connects to models; it even has a native Ollama adapter, which means it expects Ollama to already exist.
+
+So the stack became: Ollama for inference, a small CLI for the logic, and a 3B model for the reading.
+
+**Measuring the speed.** The first benchmark was brutal — 0.66 tokens per second. The agent diagnosed it instead of guessing:
+
+> **Hermes:** First run (Chrome open, swap): 0.66 tok/s, 39 s model load. Second (model unloaded, ctx 2048): 2.43 tok/s, 16 s load.
+> **Hermes:** Cause: Core m5-6Y57 — two cores, 1.1–2.8 GHz, 4.5 W; powersave at 1.1 GHz, and Chrome holds 4.2 GB of 7.2 — the model (2.2 GB) is pushed into zram.
+
+Closing the browser and switching to the performance profile took it to about 7 tok/s. That number decided the product: a nightly job, not an interactive tool.
+
+**The failure that shaped the design.** The first version asked the model to classify eight files at once, in a JSON array with ids:
+
+> **Hermes:** The first batch of eight files the model couldn't handle — a timeout. And in a batch of six it mixed the names between files.
+
+The fix was to shrink the task until it fit the model: one file, one short answer, no ids to mismatch. The prompt now asks for a kebab-case name only; the tool sanitizes it, keeps the extension, and rejects anything that looks like prose.
+
 ## The Lazy Payoff
 
 - 14 files → 8 folders, 3 renames, **10.6 s** warm (≈60 s cold while the model loads).

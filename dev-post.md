@@ -107,7 +107,7 @@ Three reasons, and the first one is why the tool exists at all.
 
 ## My Agent Session
 
-This project was built in a **Hermes Agent** session — an open-source agent harness. The tool it produced runs `qwen2.5:3b` locally through Ollama. The full transcript lives in the project repository and is mostly tool calls, so here are the three moments that shaped the project. Quotes are translated from Russian and lightly condensed.
+This project was built in a **Hermes Agent** session — an open-source agent harness. The tool it produced runs `qwen2.5:3b` locally through Ollama. A transcript of the conversation lives in the project repository; the session itself is mostly tool calls, so here are the three moments that shaped the project. Quotes are translated from Russian and lightly condensed.
 
 **Choosing the runtime.** I started by asking whether a local-first desktop agent I had found could replace Ollama. The answer was no — and that answer set the architecture:
 
@@ -135,4 +135,4 @@ That's why every call now carries one file and expects one short answer.
 - Undo: one command, all 14 files back.
 - I didn't open a single file. Opening each scan to see what it is takes me about a minute per file; the tool does the whole folder in ten seconds, and I can be asleep while it works.
 
-Next: a systemd user timer so it runs at 3 a.m. on its own, and a `--review` mode that asks before each rename. Slow and steady.
+Next: a `--review` mode that asks before each rename. Slow and steady.

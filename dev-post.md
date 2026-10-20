@@ -71,15 +71,15 @@ demo/make_demo.py     # builds the messy demo folder
 **The split of labor.** Type folders are a solved problem: an extension is not a guess, so rules do it, instantly and offline. The model is reserved for the one job that actually needs reading. That split is also a safety feature — the model never decides *whether* a file moves, only what it is called.
 
 ```mermaid
-flowchart TD
-    A[Messy folder] --> B[Rules<br/>type + name]
-    A --> C{Cryptic name?}
+flowchart LR
+    A[Folder] --> B[Rules<br/>folders + tidy]
+    A --> C{Cryptic?}
     C -- yes --> D[Model<br/>names it]
     C -- no --> B
-    D -.->|offline or unreadable| B
+    D -.->|offline| B
     B --> E[Plan<br/>dry run]
     D --> E
-    E -->|--apply| F[Move + undo log]
+    E -->|--apply| F[Move + log]
     F -->|--undo| A
 ```
 

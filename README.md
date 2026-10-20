@@ -121,15 +121,15 @@ at all: the endpoint is `127.0.0.1` by default.
 ## How it works
 
 ```mermaid
-flowchart TD
-    A[Messy folder] --> B[Rules<br/>type + name]
-    A --> C{Cryptic name?}
+flowchart LR
+    A[Folder] --> B[Rules<br/>folders + tidy]
+    A --> C{Cryptic?}
     C -- yes --> D[Model<br/>names it]
     C -- no --> B
-    D -.->|offline or unreadable| B
+    D -.->|offline| B
     B --> E[Plan<br/>dry run]
     D --> E
-    E -->|--apply| F[Move + undo log]
+    E -->|--apply| F[Move + log]
     F -->|--undo| A
 ```
 

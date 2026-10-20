@@ -1,0 +1,9 @@
+[Unit]
+Description=Run slothsort every night at 03:00
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

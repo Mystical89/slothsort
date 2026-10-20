@@ -56,7 +56,21 @@ slothsort.py ~/Downloads --base-url http://127.0.0.1:8080/v1 --model qwen2.5:3b
 slothsort.py ~/Downloads --json
 ```
 
-## Real output
+## Nightly run
+
+The repo ships a `systemd --user` unit pair that tidies `~/Downloads` at 03:00:
+
+```bash
+mkdir -p ~/.config/systemd/user
+cp systemd/slothsort.service systemd/slothsort.timer ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now slothsort.timer   # turn off: disable --now
+journalctl --user -u slothsort                  # what it did last night
+```
+
+Edit `ExecStart` in `systemd/slothsort.service` if your checkout or target folder differs.
+
+## Real output (one run — the model's exact name varies between runs)
 
 Dry run on the 14-file demo folder (`demo/make_demo.py`), with `qwen2.5:3b` on
 Ollama:

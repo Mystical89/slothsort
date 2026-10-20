@@ -1,0 +1,8 @@
+[Unit]
+Description=slothsort — tidy the Downloads folder with the local model
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/projects/slothsort/slothsort.py %h/Downloads --apply --max 20
+Nice=10
+IOSchedulingClass=idle

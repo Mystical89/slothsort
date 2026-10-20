@@ -107,7 +107,7 @@ Three reasons, and the first one is why the tool exists at all.
 
 ## My Agent Session
 
-This project was built in a **Hermes Agent** session — an open-source agent harness. The tool it produced runs `qwen2.5:3b` locally through Ollama. The full transcript is mostly tool calls, so here are the three moments that shaped the project. Quotes are translated from Russian and lightly condensed.
+This project was built in a **Hermes Agent** session — an open-source agent harness. The tool it produced runs `qwen2.5:3b` locally through Ollama. The full transcript lives in the project repository (`docs/session.md`) and is mostly tool calls, so here are the three moments that shaped the project. Quotes are translated from Russian and lightly condensed.
 
 **Choosing the runtime.** I started by asking whether a local-first desktop agent I had found could replace Ollama. The answer was no — and that answer set the architecture:
 

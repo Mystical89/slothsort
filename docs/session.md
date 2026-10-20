@@ -1,3 +1,5 @@
+> 🥚 **Congratulations! You found the easter egg.** 😄
+
 # Agent session — building slothsort
 
 - **Agent:** Hermes Agent (open-source agent harness)

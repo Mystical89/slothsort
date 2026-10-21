@@ -567,9 +567,11 @@ def undo_last_run(root: Path) -> int:
         except OSError:
             pass
     log_path.rename(log_path.with_suffix(".undone.json"))
-    print(f"Undone {restored} moves from run {data.get('run', log_path.stem)}.")
+    move_word = "move" if restored == 1 else "moves"
+    print(f"Undone {restored} {move_word} from run {data.get('run', log_path.stem)}.")
     if removed_dirs:
-        print(f"Removed {removed_dirs} empty folders.")
+        plural = "folder" if removed_dirs == 1 else "folders"
+        print(f"Removed {removed_dirs} empty {plural}.")
     return 0
 
 

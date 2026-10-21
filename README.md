@@ -125,7 +125,7 @@ at all: the endpoint is `127.0.0.1` by default.
 ## Safety
 
 - **Dry run by default.** Files move only with `--apply`.
-- **Never deletes.** Everything is moved, nothing is removed.
+- **Never deletes files.** Everything is moved; `--undo` only removes empty folders the run itself created.
 - **Never overwrites.** A name collision becomes `file (2).pdf`.
 - **Undo.** Every run writes a JSON log to `.slothsort/runs/`; `--undo`
   reverses the last one and removes the empty folders that run created.
@@ -176,7 +176,7 @@ interactive clicking.
 python3 -m unittest -v test_slothsort.py
 ```
 
-25 tests, no network and no model required — parsing, rules, planning, apply,
+27 tests, no network and no model required — parsing, rules, planning, apply,
 dedupe and undo are all covered with a fake chat function.
 
 ## License

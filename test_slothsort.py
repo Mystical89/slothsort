@@ -218,6 +218,7 @@ class ApplyUndoTest(TempFolder):
         self.assertTrue(log_path.is_file())
         data = json.loads(log_path.read_text(encoding="utf-8"))
         self.assertEqual(len(data["entries"]), 2)
+        self.assertEqual(sorted(data["created"]), ["Documents", "Images"])
 
     def test_apply_dedupes_existing_target(self):
         (self.folder / "Documents").mkdir()
@@ -243,6 +244,29 @@ class ApplyUndoTest(TempFolder):
         self.assertTrue((self.folder / "invoice.pdf").is_file())
         self.assertTrue((self.folder / "photo.jpg").is_file())
         self.assertFalse((self.folder / "Documents" / "invoice.pdf").exists())
+
+    def test_undo_removes_created_folders(self):
+        make_file(self.folder, "invoice.pdf")
+        make_file(self.folder, "photo.jpg")
+        files = slothsort.collect_files(self.folder)
+        plan, _ = slothsort.build_plan(files, slothsort.Options(offline=True))
+        slothsort.apply_plan(self.folder, plan)
+        self.assertTrue((self.folder / "Documents").is_dir())
+
+        self.assertEqual(slothsort.undo_last_run(self.folder), 0)
+        self.assertFalse((self.folder / "Documents").exists())
+        self.assertFalse((self.folder / "Images").exists())
+
+    def test_undo_keeps_pre_existing_folders(self):
+        (self.folder / "Documents").mkdir()
+        make_file(self.folder / "Documents", "keep.pdf", b"keep")
+        make_file(self.folder, "invoice.pdf")
+        files = slothsort.collect_files(self.folder)
+        plan, _ = slothsort.build_plan(files, slothsort.Options(offline=True))
+        slothsort.apply_plan(self.folder, plan)
+
+        self.assertEqual(slothsort.undo_last_run(self.folder), 0)
+        self.assertTrue((self.folder / "Documents" / "keep.pdf").is_file())
 
     def test_undo_twice_returns_error(self):
         make_file(self.folder, "invoice.pdf")

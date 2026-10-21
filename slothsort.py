@@ -494,12 +494,15 @@ def apply_plan(root: Path, plan: list[PlanItem]) -> Path:
     run_dir = root / LOG_DIR / "runs"
     run_dir.mkdir(parents=True, exist_ok=True)
     entries = []
+    created = []
     for item in plan:
         target_dir = root / item.category
-        target_dir.mkdir(exist_ok=True)
         destination = unique_path(target_dir / item.new_name)
         if destination == item.file.path:
             continue
+        if not target_dir.exists():
+            target_dir.mkdir()
+            created.append(str(target_dir.relative_to(root)))
         shutil.move(str(item.file.path), str(destination))
         entries.append(
             {
@@ -515,6 +518,7 @@ def apply_plan(root: Path, plan: list[PlanItem]) -> Path:
                 "root": str(root),
                 "started": datetime.now().isoformat(timespec="seconds"),
                 "entries": entries,
+                "created": created,
             },
             ensure_ascii=False,
             indent=2,
@@ -553,8 +557,19 @@ def undo_last_run(root: Path) -> int:
     if restored == 0:
         sys.stderr.write("slothsort: nothing to undo — the files are already back\n")
         return 1
+    removed_dirs = 0
+    for name in data.get("created", []):
+        folder = root / name
+        try:
+            if folder.is_dir() and not any(folder.iterdir()):
+                folder.rmdir()
+                removed_dirs += 1
+        except OSError:
+            pass
     log_path.rename(log_path.with_suffix(".undone.json"))
     print(f"Undone {restored} moves from run {data.get('run', log_path.stem)}.")
+    if removed_dirs:
+        print(f"Removed {removed_dirs} empty folders.")
     return 0
 
 

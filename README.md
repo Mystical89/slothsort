@@ -128,7 +128,7 @@ at all: the endpoint is `127.0.0.1` by default.
 - **Never deletes.** Everything is moved, nothing is removed.
 - **Never overwrites.** A name collision becomes `file (2).pdf`.
 - **Undo.** Every run writes a JSON log to `.slothsort/runs/`; `--undo`
-  reverses the last one.
+  reverses the last one and removes the empty folders that run created.
 - **Skips** hidden files, symlinks and the log directory.
 - **Falls back to rules** if the model endpoint is down — the tool still works.
 

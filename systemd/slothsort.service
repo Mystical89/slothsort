@@ -3,7 +3,6 @@ Description=slothsort — tidy the Downloads folder with the local model
 
 [Service]
 Type=oneshot
-WorkingDirectory=%h/slothsort
-ExecStart=/usr/bin/python3 slothsort.py %h/Downloads --apply --max 20
+ExecStart=/usr/bin/python3 %h/slothsort/slothsort.py %h/Downloads --apply --max 20
 Nice=10
 IOSchedulingClass=idle
